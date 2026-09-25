@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TREDT SMP 2 Public Archive</title>
+
+<style>
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    color: #fff;
+    font-family: "Courier New", monospace;
+    overflow: hidden;
+}
+
+.screen {
+    position: absolute;
+    inset: 0;
+    padding: 28px;
+    box-sizing: border-box;
+}
+
+#startScreen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#bootScreen,
+#archiveScreen {
+    display: none;
+}
+
+#openBtn {
+    background: #7CFC00;
+    color: #000;
+    border: 3px solid #7CFC00;
+    padding: 22px 46px;
+    font-size: 30px;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+#openBtn:hover {
+    background: #000;
+    color: #7CFC00;
+}
+
+#bootTerminal,
+#archiveTerminal {
+    white-space: pre-wrap;
+    font-size: 22px;
+    line-height: 1.4;
+}
+
+.cursor {
+    animation: blink 1s steps(2) infinite;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+.downloadBtn {
+    display: inline-block;
+    margin-top: 22px;
+    padding: 14px 24px;
+    border: 2px solid #7CFC00;
+    color: #7CFC00;
+    text-decoration: none;
+    font-size: 22px;
+}
+
+.downloadBtn:hover {
+    background: #7CFC00;
+    color: #000;
+}
+</style>
+
+</head>
+<body>
+
+<div id="startScreen" class="screen">
+    <button id="openBtn">OPEN ARCHIVE</button>
+</div>
+
+<div id="bootScreen" class="screen">
+    <div id="bootTerminal"></div>
+</div>
+
+<div id="archiveScreen" class="screen">
+    <div id="archiveTerminal"></div>
+    <a class="downloadBtn" href="https://github.com/TREDTCODER/tredtsmp2.0-archive/releases/download/v1.0/TREDTSMP2.Archive.zip">DOWNLOAD ARCHIVE</a>
+</div>
+
+<script>
+const bootLines = [
+'TREDT UNION ARCHIVE V1.02(R) Archive System',
+'Version 1.02',
+'',
+'Copyright (C) TREDT SMP 2023-2026',
+'',
+'Starting TREDT Archive BIOS v1.02',
+'',
+'System RAM..................... OK',
+'Checking storage media.............. OK',
+'Verifying archive integrity......... OK',
+'Mounting read-only archive.......... OK',
+'Loading historical records.......... OK',
+'Initializing terminal............... OK',
+'',
+'NOTICE:',
+'The TREDT SMP 2 server has been permanently dissolved.',
+'A public historical archive has been established.',
+'',
+'Launching archive terminal...',
+'',
+'C:\\TREDT_ARCHIVE>'
+];
+
+const archiveText = `TREDT UNION ARCHIVE V1.02(R) Archive System
+
+C:\\TREDT_ARCHIVE> dir
+
+Volume in drive C is TREDT_ARCHIVE
+Volume Serial Number is 57531-2026
+
+Directory of C:\\TREDT_ARCHIVE
+
+TREDT SMP 2 PUBLIC ARCHIVE
+
+Status : Archived
+Access : Public
+Archive Size : 214 MB
+File Size: 214 MB
+Files : 23,751 
+File Type: .zip
+Directories : 530
+
+The TREDT SMP 2 server has been permanently preserved
+for public access.
+
+Archive Period: 24 August 2026 to 25 September 2026.
+
+Original Server:
+IP: schmidt-capture.tun.ply.gg 
+Port: 25565 
+DNS: 127.0.0.1
+Press the button below to download the complete archive.
+
+C:\\TREDT_ARCHIVE>`;
+
+const bootTerminal = document.getElementById('bootTerminal');
+const archiveTerminal = document.getElementById('archiveTerminal');
+
+document.getElementById('openBtn').addEventListener('click', () => {
+document.getElementById('startScreen').style.display = 'none';
+document.getElementById('bootScreen').style.display = 'block';
+
+bootTerminal.textContent = '';
+
+let index = 0;
+
+function printNextLine() {
+if (index < bootLines.length) {
+bootTerminal.textContent += bootLines[index] + '\n';
+index++;
+
+  // Keep the newest line visible
+  bootTerminal.scrollTop = bootTerminal.scrollHeight;
+
+  setTimeout(printNextLine, 300);
+} else {
+  setTimeout(showArchive, 600);
+}
+
+}
+
+printNextLine();
+});
+
+function showArchive() {
+document.getElementById('bootScreen').style.display = 'none';
+document.getElementById('archiveScreen').style.display = 'block';
+
+archiveTerminal.textContent = archiveText;
+
+const cursor = document.createElement('span');
+cursor.className = 'cursor';
+cursor.textContent = '_';
+archiveTerminal.appendChild(cursor);
+}
+</script>
+
+</body>
+</html>
