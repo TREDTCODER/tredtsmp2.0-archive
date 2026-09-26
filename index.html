@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -7,21 +6,50 @@
 <title>TREDT SMP 2 Public Archive</title>
 
 <style>
+:root {
+    --crt-green: #33ff33;
+    --crt-green-glow: rgba(51, 255, 51, 0.6);
+    --crt-bg: #050e05;
+}
+
 html, body {
     margin: 0;
     width: 100%;
     height: 100%;
-    background: #000;
-    color: #fff;
+    background: var(--crt-bg);
+    color: var(--crt-green);
     font-family: "Courier New", monospace;
     overflow: hidden;
+    /* Phosphor Text Glow */
+    text-shadow: 0 0 5px var(--crt-green-glow), 0 0 10px var(--crt-green-glow);
+}
+
+/* CRT Screen Scanlines, Curve Vignette, & Flicker Overlay */
+.crt-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+    background: 
+        radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.85) 100%),
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%);
+    background-size: 100% 100%, 100% 4px;
+    box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.95);
+    animation: flicker 0.15s infinite;
+}
+
+@keyframes flicker {
+    0% { opacity: 0.96; }
+    50% { opacity: 1; }
+    100% { opacity: 0.98; }
 }
 
 .screen {
     position: absolute;
     inset: 0;
-    padding: 28px;
+    padding: 35px;
     box-sizing: border-box;
+    overflow-y: auto;
 }
 
 #startScreen {
@@ -36,18 +64,22 @@ html, body {
 }
 
 #openBtn {
-    background: #7CFC00;
+    background: var(--crt-green);
     color: #000;
-    border: 3px solid #7CFC00;
+    border: 3px solid var(--crt-green);
     padding: 22px 46px;
     font-size: 30px;
     font-family: inherit;
+    font-weight: bold;
     cursor: pointer;
+    box-shadow: 0 0 18px var(--crt-green-glow);
+    transition: all 0.2s ease;
 }
 
 #openBtn:hover {
     background: #000;
-    color: #7CFC00;
+    color: var(--crt-green);
+    box-shadow: 0 0 30px var(--crt-green);
 }
 
 #bootTerminal,
@@ -57,7 +89,13 @@ html, body {
     line-height: 1.4;
 }
 
+/* Glowing Block Cursor */
 .cursor {
+    display: inline-block;
+    background-color: var(--crt-green);
+    color: #000;
+    margin-left: 2px;
+    box-shadow: 0 0 8px var(--crt-green);
     animation: blink 1s steps(2) infinite;
 }
 
@@ -65,24 +103,36 @@ html, body {
     50% { opacity: 0; }
 }
 
+.buttonContainer {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
 .downloadBtn {
     display: inline-block;
-    margin-top: 22px;
     padding: 14px 24px;
-    border: 2px solid #7CFC00;
-    color: #7CFC00;
+    border: 2px solid var(--crt-green);
+    color: var(--crt-green);
     text-decoration: none;
-    font-size: 22px;
+    font-size: 20px;
+    font-weight: bold;
+    box-shadow: 0 0 10px var(--crt-green-glow);
+    transition: all 0.2s ease;
 }
 
 .downloadBtn:hover {
-    background: #7CFC00;
+    background: var(--crt-green);
     color: #000;
+    box-shadow: 0 0 22px var(--crt-green);
 }
 </style>
 
 </head>
 <body>
+
+<div class="crt-overlay"></div>
 
 <div id="startScreen" class="screen">
     <button id="openBtn">OPEN ARCHIVE</button>
@@ -94,7 +144,10 @@ html, body {
 
 <div id="archiveScreen" class="screen">
     <div id="archiveTerminal"></div>
-    <a class="downloadBtn" href="https://github.com/TREDTCODER/tredtsmp2.0-archive/releases/download/v1.0/TREDTSMP2.Archive.zip">DOWNLOAD ARCHIVE</a>
+    <div class="buttonContainer">
+        <a class="downloadBtn" href="https://github.com/TREDTCODER/tredtsmp2.0-archive/releases/download/v1.0/TREDTSMP2.Archive.zip" target="_blank">DOWNLOAD ARCHIVE</a>
+        <a class="downloadBtn" href="#">OPEN 3D BLUEMAP</a>
+    </div>
 </div>
 
 <script>
@@ -150,7 +203,8 @@ Original Server:
 IP: schmidt-capture.tun.ply.gg 
 Port: 25565 
 DNS: 127.0.0.1
-Press the button below to download the complete archive.
+Hosting Partners: Aternos GmbH & playit.gg (Developed Methods LLC)
+Press the buttons below to access archive assets.
 
 C:\\TREDT_ARCHIVE>`;
 
@@ -158,41 +212,39 @@ const bootTerminal = document.getElementById('bootTerminal');
 const archiveTerminal = document.getElementById('archiveTerminal');
 
 document.getElementById('openBtn').addEventListener('click', () => {
-document.getElementById('startScreen').style.display = 'none';
-document.getElementById('bootScreen').style.display = 'block';
+    document.getElementById('startScreen').style.display = 'none';
+    document.getElementById('bootScreen').style.display = 'block';
 
-bootTerminal.textContent = '';
+    bootTerminal.textContent = '';
 
-let index = 0;
+    let index = 0;
 
-function printNextLine() {
-if (index < bootLines.length) {
-bootTerminal.textContent += bootLines[index] + '\n';
-index++;
+    function printNextLine() {
+        if (index < bootLines.length) {
+            bootTerminal.textContent += bootLines[index] + '\n';
+            index++;
 
-  // Keep the newest line visible
-  bootTerminal.scrollTop = bootTerminal.scrollHeight;
+            bootTerminal.scrollTop = bootTerminal.scrollHeight;
 
-  setTimeout(printNextLine, 300);
-} else {
-  setTimeout(showArchive, 600);
-}
+            setTimeout(printNextLine, 250);
+        } else {
+            setTimeout(showArchive, 500);
+        }
+    }
 
-}
-
-printNextLine();
+    printNextLine();
 });
 
 function showArchive() {
-document.getElementById('bootScreen').style.display = 'none';
-document.getElementById('archiveScreen').style.display = 'block';
+    document.getElementById('bootScreen').style.display = 'none';
+    document.getElementById('archiveScreen').style.display = 'block';
 
-archiveTerminal.textContent = archiveText;
+    archiveTerminal.textContent = archiveText;
 
-const cursor = document.createElement('span');
-cursor.className = 'cursor';
-cursor.textContent = '_';
-archiveTerminal.appendChild(cursor);
+    const cursor = document.createElement('span');
+    cursor.className = 'cursor';
+    cursor.textContent = ' ';
+    archiveTerminal.appendChild(cursor);
 }
 </script>
 
